@@ -1,0 +1,40 @@
+{
+  "name": "qmcu-brundle-fly",
+  "version": "1.0.0",
+  "description": "a backup and restore \u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5D\u001b[1;5DQlik Sense backup and restore plugin for QMCUtilities",
+  "main": "server.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eapowertools/qmcu-brundle-fly.git"
+  },
+  "keywords": [
+    "source",
+    "control",
+    "light",
+    "qlik",
+    "sense"
+  ],
+  "author": "EAPowerTools",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eapowertools/qmcu-brundle-fly/issues"
+  },
+  "homepage": "https://github.com/eapowertools/qmcu-brundle-fly#readme",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "express": "^4.14.0",
+    "extend": "^3.0.0",
+    "file-system": "^2.2.1",
+    "jsonfile": "^2.4.0",
+    "path": "^0.12.7",
+    "qrs-interact": "^2.1.0",
+    "qsocks": "^3.1.0",
+    "serializeapp": "^2.0.0"
+  }
+}

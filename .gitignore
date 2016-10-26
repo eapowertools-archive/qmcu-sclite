@@ -1,0 +1,8 @@
+# Dependency Directories
+node_modules
+output
+certs
+
+
+#file extensions
+.log
