@@ -11,7 +11,7 @@ var fs = require('fs');
 var x = {};
 var outputPath = 'f:/my documents/_git/qmcu-brundle-fly/output';
 
-var appId = '54965c35-ae73-4765-98fc-0faf87bed421';
+var appId = '4ddcedb3-acbf-4d7a-90bb-40ac7b2bc0a5';
 
 
 qsocksAppConfig = extend(true, config.qsocks, {

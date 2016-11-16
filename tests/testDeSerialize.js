@@ -7,14 +7,14 @@ var loadFile = require('./testloadFile');
 var changeAppOwner = require('./testChangeAppOwner');
 
 var x = {};
-var inputPath = 'f:/my documents/_git/qmcu-brundle-fly/output/Metrics_Library';
+var inputPath = 'f:/my documents/_git/qmcu-brundle-fly/output/Travel_Expense_Management';
 var makeOwnerid = "4ddcedb3-acbf-4d7a-90bb-40ac7b2bc0a5";
 
 qsocks.Connect(config.qsocks).then(function(global)
 {
     console.log("qsocks connection");
     x.global = global;
-    return global.createApp('Metrics Library (1)', 'Main')
+    return global.createApp('Yippee', 'Main')
     .then(function(result)
     {
         if(result.qSuccess)
@@ -42,6 +42,11 @@ qsocks.Connect(config.qsocks).then(function(global)
             {
                 var sheets = loadFile(inputPath + "/sheets.json")
                 return importSheets(x.app, sheets);
+            })
+            .then(function()
+            {
+                var bookmarks = loadFile(inputPath + "/bookmarks.json")
+                return importBookmarks(x.app,bookmarks);
             })
             .then(function()
             {
@@ -82,6 +87,18 @@ function importSheets(app, data)
             {
                 console.log("added sheet "  + sheet.qProperty.qMetaDef.title);
             })
+        })
+    }))
+}
+
+function importBookmarks(app, data)
+{
+    return Promise.all(data.bookmarks.map(function(bookmark)
+    {
+        return app.createBookmark(bookmark)
+        .then(function(handle)
+        {
+            console.log(handle);
         })
     }))
 }

@@ -35,6 +35,6 @@
     "path": "^0.12.7",
     "qrs-interact": "^2.1.0",
     "qsocks": "^3.1.0",
-    "serializeapp": "^2.0.0"
+    "serializeapp": "^2.1.0"
   }
 }
