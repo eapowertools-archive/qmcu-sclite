@@ -16,7 +16,8 @@ qsocks.Connect(config.qsocks).then(function(global)
 {
     console.log("qsocks connection");
     x.global = global;
-    return global.createApp('Yippee', 'Main')
+    var appProps = loadFile(inputPath + "/properties.json");
+    return global.createApp(appProps.properties.qTitle, 'Main')
     .then(function(result)
     {
         if(result.qSuccess)
@@ -35,6 +36,9 @@ qsocks.Connect(config.qsocks).then(function(global)
         {
             x.app = app;
             x.ids = [];
+
+        
+
             return changeAppOwner.changeAppOwner(appId,makeOwnerid)
             .then(function()
             {
