@@ -6,6 +6,7 @@ var fs = require('fs');
 var certPath = 'F:/my documents/_git/qmcu-brundle-fly/certs';
 
 config = extend(true, config, {
+    outputPath: path.resolve(__dirname,"..","output"),
     certificates:
     {
         client: path.resolve(certPath, 'client.pem'),

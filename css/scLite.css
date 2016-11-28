@@ -1,0 +1,106 @@
+.scLite .navbar-fixed-top
+{
+    margin-left:250px;
+}
+
+.scLite #page-content-header {
+    background:#404040;
+    top:0;
+    height:69px;
+    width:100%;
+    line-height: 69px;
+    z-index:1000;
+}
+
+.scLite #page-content-search {
+    top:70px;
+    height: 38px;
+    z-index:1000;
+
+}
+
+.scLite #page-content-body {
+    margin-top: 107px;
+    margin-bottom: 50px;
+}
+
+
+.scLite #page-content-footer {
+   position:fixed;
+   bottom:0px;
+   height:50px;
+   width:100%;
+   background: #8C8C8C;
+}
+
+.scLite #button-bar {
+  position: absolute;
+  top: 50%;
+  left:10px;
+  transform: translateY(-50%);
+}
+
+.scLite .support {
+    left: 400px;
+}
+
+.scLite .title {
+    color: rgba(255,255,255,0.8);
+    float:left;
+    font-size: 36px;
+    margin-top:15px;
+    padding-left:15px;
+}
+
+.scLite .usage-content {
+    position: absolute;
+    width:600px;
+    height: 250px;
+    margin-top:-15%;
+    margin-left:20%;
+}
+
+.scLite .highlighted {
+    color: #595959;
+    background-color: #A0A0A0;
+}
+
+.scLite tbody tr.hover#highlighted{
+    color: #ffffff;
+    background-color: #595959;
+}
+
+.scLite tbody tr:hover, tr.alt:hover {
+    color: #ffffff;
+    background-color: #595959;
+}
+
+
+.scLite .column{
+    word-wrap: break-word;
+    width:200px;
+}
+
+.scLite .small-column
+{
+    width:100px;
+}
+
+.scLite .table-data
+{
+    /*margin-top:145px;*/
+    overflow-y:auto;
+    table-layout:fixed;
+    overflow-x:hidden;
+}
+
+.scLite .table-head
+{
+    margin-bottom:0px;
+    background: white;
+    table-layout:fixed;
+}
+
+.scLite .highlightedText {
+    background:yellow;
+}

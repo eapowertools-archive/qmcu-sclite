@@ -1,0 +1,82 @@
+<div class="navbar-fixed-top">
+    <div id="page-content-header">
+        <h1 class="title">Source Control Lite</h1>
+        <button style="float:right;margin-right:20px;margin-top:20px;" class="lui-button  lui-button--toolbar-inverse" id="help-dialog"
+            ng-click="model.openHelp()">?</button>
+    </div>
+    <div id="page-content-search">
+        <div class="lui-bg-inverse">
+            <div class="lui-search lui-search--inverse">
+                <span class="lui-search__search-icon"></span>
+                <input type="text" class="lui-search__input" maxlength="255" spellcheck="false" placeholder="Search" ng-model="searchApps"
+                />
+                <span class="lui-search__clear-icon"></span>
+            </div>
+        </div>
+    </div>
+    <!--        <div>
+          <table id="headerrow" class="table table-bordered table-head">
+                <colgroup>
+                    <col style="width:85px;min-width:85px;max-width:85px;">
+                    <col style="width:150px;min-width:100px;max-width:200px;">
+                    <col style="width:100px;min-width:100px;max-width:150px;">
+                    <col style="width:100px;min-width:100px;max-width:100px;">
+                    <col style="width:100px;min-width:100px;max-width:100px;">
+                    <col style="width:100px;min-width:150px;max-width:150px;">
+                    <col style="width:200px;min-width:150px;max-width:200px;">
+                    <col style="width:200px;min-width:150px;max-width:200px;">
+                    <col style="width:200px;min-width:150px;max-width:200px;">
+                </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="column th-column">Selected</th>
+                            <th class="column th-column" ng-repeat="column in model.columnNames | filter: display=true | orderBy: '+colNum' " ng-style="{'width': column.colWidth + 'px'}">                        
+                                {{column.friendlyName}}
+                            </th>
+                        </tr>
+                    </thead>
+            </table>            
+        </div> -->
+</div>
+<div id="page-content-body">
+    <form name="form">
+        <div>
+            <table class="table table-bordered table-data">
+                <colgroup>
+                    <col style="width:150px;min-width:100px;max-width:150px;">
+                    <col style="width:200px;min-width:100px;max-width:200px;">
+                    <col style="width:100px;min-width:100px;max-width:150px;">
+                    <col style="width:150px;min-width:100px;max-width:150px;">
+                    <col style="width:150px;min-width:100px;max-width:150px;">
+                    <col style="width:100px;min-width:100px;max-width:150px;">
+                    <col style="width:85px;min-width:85px;max-width:85px;">
+                    <col style="width:85px;min-width:85px;max-width:85px;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th  class="column" style="margin:auto;text-align:center;" ng-repeat="column in model.columnNames | filter: display=true | orderBy: '+colNum' ">
+                            {{column.friendlyName}}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in model.tableRows | filter: searchApps track by $index">
+                        <td class="column" ng-repeat="col in row track by $index" ng-bind-html="col | highlight:searchApps">
+                            {{col}}
+                        </td>
+                        <td align="center" style="margin: auto;vertical-align:middle;"><input type="button" class="lui-button lui-button--info" ng-click="model.backup(row)" value="Backup"></td>
+                        <td align="center" style="margin: auto;vertical-align:middle;"><input type="button" class="lui-button lui-button--success" ng-click="model.restore(row)" value="Restore"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+<div id="page-content-footer">
+    <!--<div id="button-bar">
+        <button id="buttonapprove" class="lui-button" ng-class="model.approveButtonValid() ? 'lui-button--toolbar-inverse' : 'lui-disabled'"
+            ng-click="model.approve()">Approve Sheet</button>
+        <button id="buttonunapprove" class="lui-button" ng-class="model.unapproveButtonValid() ? 'lui-button--toolbar-inverse' : 'lui-disabled'"
+            ng-click="model.unapprove()">Un-Approve Sheet</button>
+    </div>-->
+</div>

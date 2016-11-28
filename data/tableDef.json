@@ -1,0 +1,69 @@
+{
+    "entity": "App",
+    "columns": [
+        {
+            "colNum": 1,
+            "friendlyName": "App Name",
+            "display": true,
+            "name": "name",
+            "columnType":"Property",
+            "definition":"name"
+        },
+        {
+            "colNum": 2,
+            "friendlyName": "App Id",
+            "display": true,
+            "name": "id",
+            "columnType":"Property",
+            "definition":"id"
+        },
+        {
+            "colNum": 3,
+            "friendlyName": "Owner",
+            "display": true,
+            "name": "owner",
+            "columnType":"Property",
+            "definition":"owner.name"
+        },
+        {
+            "colNum": 4,
+            "friendlyName": "Last Modified",
+            "display": true,
+            "name": "modifiedDate",
+            "columnType": "Property",
+            "definition": "modifiedDate"
+        },
+        {
+            "colNum": 5,
+            "friendlyName": "Published",
+            "display": true,
+            "name": "publishTime",
+            "columnType": "Property",
+            "definition": "publishTime"
+        },
+        {
+            "colNum": 6,
+            "friendlyName": "Stream",
+            "display": true,
+            "name": "stream",
+            "columnType": "Property",
+            "definition": "stream.name"
+        },
+        {
+            "colNum": 7,
+            "friendlyName": "Backup",
+            "display": true,
+            "name": "backup",
+            "columnType": "custom",
+            "definition": "backup"
+        },
+        {
+            "colNum": 8,
+            "friendlyName": "Restore",
+            "display": true,
+            "name": "restore",
+            "columnType": "custom",
+            "definition": "restore"
+        }
+    ]
+}
