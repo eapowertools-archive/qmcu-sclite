@@ -1,6 +1,6 @@
 (function(){
     "use strict";
-    var module = angular.module("QMCUtilities",["ngDialog"]);
+    var module = angular.module("QMCUtilities",["ngFileUpload","ngDialog"]);
 
     function fetchTableHeaders($http) {
         return $http.get("/sclite/data/tableDef.json")
@@ -26,27 +26,53 @@
         });
     }
     
-    function backupApp($http, appId)
+    function backupApp($http, appId, boolZip)
     {
-        return $http.post("/sclite/backup/" + appId)
+        if(boolZip)
+        {
+            return exportZip($http, appId, boolZip)
+            .then(function(response)
+            {
+                return response.data;
+            });
+        }
+        else
+        {
+            return $http.post("/sclite/backup/" + appId, boolZip)
+            .then(function(response)
+            {
+                return response.data;
+            });
+        }
+
+    }
+
+    function restoreApp($http, filePath, owner)
+    {
+        var body = {
+            filePath : filePath,
+            owner: owner
+        };
+        return $http.post("/sclite/restore", body)
         .then(function(response)
         {
-            return response.data;
+            return response.data
         });
     }
 
-    function exportRules($http, ruleIds) {
-        return $http.post('/rulemanager/exportRules', ruleIds)
+    function exportZip($http, appId, createZip) {
+        return $http.post('/sclite/backup/' + appId, createZip, {responseType: 'arraybuffer'})
             .success(function (data, status, headers, config) {
-                var jsonBlob = new Blob([JSON.stringify(data, null, " ") + '\n'], {
-                        type: "application/json;charset=utf-8;"
-                    });
-                var fileName = "exported-rules.json";
+                var zipBlob = new Blob([data], {type: 'application/zip'});
+                // var jsonBlob = new Blob([JSON.stringify(data, null, " ") + '\n'], {
+                //         type: "application/json;charset=utf-8;"
+                //     });
+                var fileName = appId + ".zip";
                 if (window.navigator.msSaveOrOpenBlob) {
                     // IE hack; see http://msdn.microsoft.com/en-us/library/ie/hh779016.aspx
-                    window.navigator.msSaveBlob(jsonBlob, fileName);
+                    window.navigator.msSaveBlob(zipBlob, fileName);
                 } else {
-                    var url = URL.createObjectURL(jsonBlob);
+                    var url = URL.createObjectURL(zipBlob);
                     var link = document.createElement('a');
                     document.body.appendChild(link);
                     link.href = url;
@@ -60,7 +86,7 @@
             });
     }
 
-    function scLiteController($scope, $http, ngDialog)
+    function scLiteController($scope, $http, ngDialog, Upload)
     {
         var model = this;
         var colNames = [];
@@ -70,6 +96,10 @@
         model.searchApps = '';
         model.thisRow = [];
         model.folders = [];
+        model.zip = false;
+        model.boolUpload = false;
+        model.file = [];
+        model.fileUploaded = false;
 
         model.$onInit = function(){
             fetchTableHeaders($http)
@@ -88,31 +118,56 @@
 
         model.cancel = function()
         {
+            model.thisRow = [];
+            model.zip = false;
+            model.boolUpload = false;
             ngDialog.closeAll();
         }
 
         model.backup = function(row)
         {
             model.thisRow = row;
-            backupApp($http, row[1])
+            ngDialog.open({
+                template: "plugins/scLite/backup-dialog.html",
+                className: "backup-dialog",
+                controller: scLiteController,
+                scope: $scope
+            });
+        }
+
+        model.checkZip = function()
+        {
+            if($("#checkZip:checked").length==1)
+            {
+                model.zip = true;
+            }
+            else
+            {
+                model.zip = false;
+            }
+        }
+
+        model.checkUpload = function()
+        {
+            if($("#checkUpload:checked").length==1)
+            {
+                model.boolUpload = true;
+            }
+            else
+            {
+                model.boolUpload = false;
+            }
+        }
+
+        model.generateBackup = function()
+        {
+            backupApp($http, model.thisRow[1], {createZip: model.zip})
             .then(function(response)
             {
-                console.log(response);
-            });
-            // fetchFolders($http)
-            // .then(function(response)
-            // {
-            //     model.folders = response.filter(function(item)
-            //         {
-            //             return item.children;
-            //         });
-            // });
-            // ngDialog.open({
-            //     template: "plugins/scLite/backup-dialog.html",
-            //     className: "backup-dialog",
-            //     controller: scLiteController,
-            //     scope: $scope
-            // });
+                //console.log(response);
+                model.zip = false;
+                ngDialog.closeAll();
+            })
         }
 
         model.restore = function(row)
@@ -126,13 +181,52 @@
             });
         }
 
+       model.selectFile = function(files)
+        {
+            model.fileSelected=true;
+            console.log(files);
+            //return model.file = files;
+            model.file = files;
+        };
+
+        model.upload = function()
+        {
+            Upload.upload({
+                url:"/sclite/upload",
+                data:
+                {
+                    file: model.file
+                },
+                arrayKey: ''
+            })
+            .then(function(response)
+            {
+                //expose file to ui
+                model.file = [];
+                model.fileSelected = false;
+                model.fileUploaded = true;
+                console.log(response);
+                model.fileToRestore = response.filePath;
+            })
+        };
+
+        model.restoreApp = function()
+        {
+            //decompress first then create app.
+            //still need to deal with who the owner is.
+            restoreApp($http, model.fileToRestore, owner)
+            .then(function(response)
+            {
+
+            });
+        }
 
     }
 
     module.component("scliteBody", {
         templateUrl:"plugins/sclite/sclite-body.html",
         controllerAs: "model",
-        controller: ["$scope", "$http", "ngDialog", scLiteController]
+        controller: ["$scope", "$http", "ngDialog", "Upload", scLiteController]
     });
 
     module.filter('highlight', function () {
@@ -141,12 +235,12 @@
                 text = text.toString();
                 search = search.toString();
                 return text.replace(new RegExp(search, 'gi'), '<span class="lui-texthighlight">$&</span>');
-            } else {
+            } 
+            else
+            {
                 return text;
             }
-
         }
-
     });
 
 }());

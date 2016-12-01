@@ -27,7 +27,9 @@
   },
   "homepage": "https://github.com/eapowertools/qmcu-brundle-fly#readme",
   "dependencies": {
+    "archiver": "^1.2.0",
     "bluebird": "^3.4.6",
+    "decompress": "^4.0.0",
     "express": "^4.14.0",
     "extend": "^3.0.0",
     "file-system": "^2.2.1",

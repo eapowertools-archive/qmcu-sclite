@@ -4,7 +4,15 @@
             <div class="lui-dialog__title">Backup App</div>
         </div>
         <div class="lui-dialog__body">
-            <h2>{{model.thisRow[0]}}</h2>
+            <h3>{{model.thisRow[0]}}</h3>
+            <p>will be backed up to the server.  Please check the checkbox to download a zip archive of the backup.</p>
+            <br>
+            <div style="verticalAlign:middle;">
+                <label><input type="checkbox" id="checkZip" value="Download Zip" ng-click="model.checkZip()">&nbsp&nbsp&nbsp&nbspDownload Zip archive</label>
+            </div>
+            <div>
+                <p ng-show="model.zip">A zip archive will be created along with a server side copy of the serialized app.</p>
+            </div>
             <!--<ul ng-repeat="folder in model.folders track by $index">
                 <li>{{folder.id}}</li>
             </ul>-->
@@ -12,7 +20,7 @@
 
         <div class="lui-dialog__footer">
             <input type="button" value="Cancel" class="lui-button lui-button--error" ng-click="model.cancel()">
-            <input type="button" value="Backup" class="lui-button lui-button--success">
+            <input type="button" value="Backup" class="lui-button lui-button--success" ng-click="model.generateBackup()">
         </div>
     </div>
     </div>
