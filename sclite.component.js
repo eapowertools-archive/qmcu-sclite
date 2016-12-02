@@ -17,8 +17,7 @@
             });
     } 
 
-    function fetchFolders($http)
-    {
+    function fetchFolders($http){
         return $http.get("/sclite/dir")
         .then(function(response)
         {
@@ -26,8 +25,7 @@
         });
     }
 
-    function fetchOwner($http, userInfo)
-    {
+    function fetchOwner($http, userInfo){
         return $http.get("/sclite/getOwnerId/" + userInfo.userDirectory + "/" + userInfo.userId)
         .then(function(response)
         {
@@ -35,8 +33,7 @@
         });
     }
     
-    function fetchUserInfo($http)
-    {
+    function fetchUserInfo($http){
         return $http.get("/sclite/getuserinfo")
         .then(function(response)
         {
@@ -45,8 +42,7 @@
         });
     }
 
-    function backupApp($http, appId, boolZip)
-    {
+    function backupApp($http, appId, boolZip){
         if(boolZip)
         {
             return exportZip($http, appId, boolZip)
@@ -66,17 +62,18 @@
 
     }
 
-    function restoreApp($http, appId, boolZip, filePath, owner)
-    {
+    function restoreApp($http, appId, boolZip, filePath, boolReload, owner){
         var body = {
             appId : appId,
             boolZip : boolZip,
             filePath : filePath,
+            boolReload : boolReload,
             owner: owner
         };
         return $http.post("/sclite/restore", body)
         .then(function(response)
         {
+            console.log(response);
             return response.data
         });
     }
@@ -119,9 +116,10 @@
         model.folders = [];
         model.zip = false;
         model.boolUpload = false;
+        model.boolReload = false;
         model.file = [];
         model.fileUploaded = false;
-        model.fileToRestore = null;
+        //model.fileToRestore = null;
         model.users = [];
 
         model.$onInit = function(){
@@ -144,16 +142,19 @@
             });
         };
 
-        model.cancel = function()
-        {
+        model.userSelect = function(){
+            
+            console.log(model.user);
+        }
+
+        model.cancel = function(){
             model.thisRow = [];
             model.zip = false;
             model.boolUpload = false;
             ngDialog.closeAll();
         }
 
-        model.backup = function(row)
-        {
+        model.backup = function(row){
             model.thisRow = row;
             ngDialog.open({
                 template: "plugins/scLite/backup-dialog.html",
@@ -163,8 +164,7 @@
             });
         }
 
-        model.checkZip = function()
-        {
+        model.checkZip = function(){
             if($("#checkZip:checked").length==1)
             {
                 model.zip = true;
@@ -175,8 +175,7 @@
             }
         }
 
-        model.checkUpload = function()
-        {
+        model.checkUpload = function(){
             if($("#checkUpload:checked").length==1)
             {
                 model.boolUpload = true;
@@ -187,8 +186,19 @@
             }
         }
 
-        model.generateBackup = function()
-        {
+        model.checkReload = function(){
+            
+            if($("#checkReload:checked").length==1)
+            {
+                model.boolReload = true;
+            }
+            else
+            {
+                model.boolReload = false;
+            }
+        }
+
+        model.generateBackup = function(){
             backupApp($http, model.thisRow[1], {createZip: model.zip})
             .then(function(response)
             {
@@ -198,39 +208,24 @@
             })
         }
 
-        model.restore = function(row)
-        {
+        model.restore = function(row){
             model.thisRow = row;
-            var select = document.getElementById("ownerSelect");
-            // var length = select.options.length;
-
-            // for (i = 0; i < length; i++) {
-            //     select.options[i] = null;
-            // }
             ngDialog.open({
                     template: "plugins/scLite/restore-dialog.html",
                     className: "restore-dialog",
                     controller: scLiteController,
                     scope: $scope
                 });
-            
-            // $scope.$on("ngDialog.opened", function(e,$dialog)
-            // {
-               
-            // });
         }
 
-
-       model.selectFile = function(files)
-        {
+       model.selectFile = function(files){
             model.fileSelected=true;
             console.log(files);
             //return model.file = files;
             model.file = files;
-        };
+        }
 
-        model.upload = function()
-        {
+        model.upload = function(){
             Upload.upload({
                 url:"/sclite/upload",
                 data:
@@ -246,26 +241,20 @@
                 model.fileSelected = false;
                 model.fileUploaded = true;
                 console.log(response);
-                model.fileToRestore = response.filePath;
-            })
-        };
+                model.fileToRestore = response.data.filePath;
 
-        model.restoreApp = function()
-        {
-            //decompress first then create app.
-            //still need to deal with who the owner is.
-            fetchOwner($http)
-            .then(function(ownerId)
-            {
-                restoreApp($http, model.thisRow[0], 
-                    model.boolUpload, model.fileToRestore, ownerId)
-                .then(function(response)
-                {
-
-                });
             })
         }
 
+        model.generateRestore = function(){
+            
+            restoreApp($http, model.thisRow[1], 
+                model.boolUpload, model.fileToRestore, model.boolReload, model.user)
+            .then(function(response)
+            {
+                console.log(response)
+            });
+        }
     }
 
     module.component("scliteBody", {

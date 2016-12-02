@@ -7,8 +7,8 @@
             <h3>{{model.thisRow[0]}}</h3>
             <p>will be restored to the Qlik Sense site as a new app into the selected user's my work area.</p>
             <div id="hw">    
-                <select chosen max-shown-results="5" search-contains="true" placeholder-text-single="Select a user..."  name="userSelect" id="selectUser" ng-model="model.user" class="lui-select lui-select--inverse">
-                    <option ng-repeat="user in model.users track by $index" value="user.id">{{user.name}}</option>
+                <select chosen max-shown-results="5" search-contains="true" placeholder-text-single="'Select a user...'"  name="userSelect" id="selectUser" ng-model="model.user" class="lui-select lui-select--inverse" data-ng-change="model.userSelect()">
+                    <option ng-repeat="user in model.users track by $index" value="{{user.id}}">{{user.name}}</option>
                 </select>
             </div>
             <div>
@@ -22,6 +22,9 @@
                         <label style="padding-right:10px;"><input type="checkbox" id="checkUpload" value="Upload Upload" ng-click="model.checkUpload()">&nbsp&nbsp&nbsp&nbspUpload Zip archive</label>
                         <input style="display:inline" type="file" ng-show="model.boolUpload" ngf-select="model.selectFile($file)" name="fileRequested">
                         <input type="button" ng-show="model.boolUpload" class="lui-button lui-button--success" value="Upload File" ng-click="model.upload()" ng-class="model.fileSelected ? 'lui-button--success' : 'lui-button--success lui-disabled'">
+                    </div>
+                    <div>
+                        <p>{{model.fileToRestore}}</p>
                     </div>
                     <div>
                         <label style="padding-right:10px;"><input type="checkbox" id="checkReload" value="Reload" ng-click="model.checkReload()">&nbsp&nbsp&nbsp&nbspReload app data on restore</label>

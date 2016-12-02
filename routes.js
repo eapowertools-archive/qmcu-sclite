@@ -7,6 +7,7 @@ var path = require('path');
 var qrsInteract = require('./lib/qrsInstance');
 var config = require('./config/runtimeConfig');
 var backupApp = require('./lib/backupApp');
+var restoreApp = require('./lib/restoreApp');
 var archive = require('./lib/archive');
 var multer = require('multer');
 var autoReap = require('multer-autoreap');
@@ -71,15 +72,36 @@ router.route("/backup/all")
 router.route("/restore")
 .post(parseUrlencoded, function(req, res)
 {
+    console.log(req.body);
     var body = req.body;
     if(body.boolZip)
     {
+        console.log(body);
         //decompress here
         decompress.extractFiles(body.filePath)
         .then(function(files)
         {
-            
-        })
+            console.log(body.filePath);
+            var appFileName = body.filePath.split("\\");
+            appFileName = appFileName[appFileName.length-1].substring(0, appFileName[appFileName.length-1].length - 4);
+            var appLocation = path.join(config.outputPath, appFileName);
+            console.log(appLocation)
+            restoreApp.restoreApp(appLocation,body.owner,body.boolReload)
+            .then(function(result)
+            {
+                console.log(result);
+                res.json(result);
+            });
+        });
+    }
+    else
+    {
+        restoreApp.restoreApp(path.join(config.outputPath, body.appId),body.owner,body.boolReload)
+        .then(function(result)
+        {
+            console.log(result);
+            res.json(result);
+        });
     }
 });
 
@@ -112,15 +134,16 @@ router.post('/upload', upload.array('file', 1) , function (req, res)
                 console.log("File Saved to " + newPath);
                 res.on('autoreap', function(reapedFile)
                 {
-                    console.log('reap file: ' + reapedFile);
+                   
+                    console.log(reapedFile);
                 });
                 res.send({filePath: newPath, message: req.files[0].originalname + "uploaded and ready to restore"});
+                res.end();
+                
             }
 
         });
     });
-	
-
 });
 
 router.route("/getAppList")
