@@ -7,6 +7,9 @@ var dest = config.outputPath;
 decompress(src, dest)
 .then(function(files)
 {
-
+    files.forEach(function(file)
+    {
+        console.log(file.path)
+    })
     console.log("done");
 })

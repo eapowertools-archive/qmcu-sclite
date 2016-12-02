@@ -25,7 +25,26 @@
             return response.data;
         });
     }
+
+    function fetchOwner($http, userInfo)
+    {
+        return $http.get("/sclite/getOwnerId/" + userInfo.userDirectory + "/" + userInfo.userId)
+        .then(function(response)
+        {
+            return response.data;
+        });
+    }
     
+    function fetchUserInfo($http)
+    {
+        return $http.get("/sclite/getuserinfo")
+        .then(function(response)
+        {
+            console.log(response.data);
+            return response.data;
+        });
+    }
+
     function backupApp($http, appId, boolZip)
     {
         if(boolZip)
@@ -47,9 +66,11 @@
 
     }
 
-    function restoreApp($http, filePath, owner)
+    function restoreApp($http, appId, boolZip, filePath, owner)
     {
         var body = {
+            appId : appId,
+            boolZip : boolZip,
             filePath : filePath,
             owner: owner
         };
@@ -100,6 +121,8 @@
         model.boolUpload = false;
         model.file = [];
         model.fileUploaded = false;
+        model.fileToRestore = null;
+        model.users = [];
 
         model.$onInit = function(){
             fetchTableHeaders($http)
@@ -113,6 +136,11 @@
                     //     model.tableRows[index].unshift(false);
                     // }
                 });
+            });
+             fetchUserInfo($http)
+            .then(function(response)
+            {
+                model.users = response;
             });
         };
 
@@ -173,13 +201,25 @@
         model.restore = function(row)
         {
             model.thisRow = row;
+            var select = document.getElementById("ownerSelect");
+            // var length = select.options.length;
+
+            // for (i = 0; i < length; i++) {
+            //     select.options[i] = null;
+            // }
             ngDialog.open({
-                template: "plugins/scLite/restore-dialog.html",
-                className: "restore-dialog",
-                controller: scLiteController,
-                scope: $scope
-            });
+                    template: "plugins/scLite/restore-dialog.html",
+                    className: "restore-dialog",
+                    controller: scLiteController,
+                    scope: $scope
+                });
+            
+            // $scope.$on("ngDialog.opened", function(e,$dialog)
+            // {
+               
+            // });
         }
+
 
        model.selectFile = function(files)
         {
@@ -214,11 +254,16 @@
         {
             //decompress first then create app.
             //still need to deal with who the owner is.
-            restoreApp($http, model.fileToRestore, owner)
-            .then(function(response)
+            fetchOwner($http)
+            .then(function(ownerId)
             {
+                restoreApp($http, model.thisRow[0], 
+                    model.boolUpload, model.fileToRestore, ownerId)
+                .then(function(response)
+                {
 
-            });
+                });
+            })
         }
 
     }

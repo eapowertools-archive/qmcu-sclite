@@ -10,6 +10,7 @@ var backupApp = require('./lib/backupApp');
 var archive = require('./lib/archive');
 var multer = require('multer');
 var autoReap = require('multer-autoreap');
+var decompress = require('./lib/decompress');
 
 router.use('/lib', express.static(config.thisServer.pluginPath + "/sclite/lib"));
 router.use('/data', express.static(config.thisServer.pluginPath + "/sclite/data"));
@@ -67,10 +68,19 @@ router.route("/backup/all")
     })
 });
 
-router.route("/restore/:id")
-.post(function(req, res)
+router.route("/restore")
+.post(parseUrlencoded, function(req, res)
 {
-
+    var body = req.body;
+    if(body.boolZip)
+    {
+        //decompress here
+        decompress.extractFiles(body.filePath)
+        .then(function(files)
+        {
+            
+        })
+    }
 });
 
 var destDir = path.join(config.thisServer.pluginPath, "sclite/uploads/");
@@ -136,6 +146,32 @@ router.route("/getAppList")
         res.send(error);
     });
 });
+
+router.route("/getuserinfo")
+.get(function(req,res)
+{
+    var path = "user/full";
+    qrsInteract.Get(path)
+    .then(function(result)
+    {
+        res.json(result.body);
+    })
+})
+
+router.route("/getOwnerId/:userDirectory/:userId")
+.get(function(req,res)
+{
+    var path = "user?filter=(userDirectory eq '" 
+        + req.params.userDirectory 
+        + "') and (userId eq '" 
+        + req.params.userId + "')";
+
+    qrsInteract.Get(path)
+    .then(function(result)
+    {
+        res.send(result.body[0].id);
+    });
+})
 
 module.exports = router;
 
