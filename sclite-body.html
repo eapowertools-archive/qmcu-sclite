@@ -60,7 +60,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="row in model.tableRows | filter: searchApps track by $index">
+                    <tr ng-repeat="row in model.tableRows | filter: searchApps track by $index" ng-show="model.showUnpublished(row[4])">
                         <td class="column" ng-repeat="col in row track by $index" ng-bind-html="col | highlight:searchApps">
                             {{col}}
                         </td>
@@ -74,7 +74,7 @@
 </div>
 <div id="page-content-footer">
     <div id="button-bar">
-        <button id="toggleUnPublishedApps" class="lui-button lui-bg-inverse" ng-click="model.toggleAll()">Toggle unpublished apps</button>
+        <button id="toggleUnPublishedApps" class="lui-button lui-bg-inverse" ng-click="model.toggleUnpublished()">Toggle unpublished apps</button>
         <button id="buttonBackupAll" class="lui-button lui-bg-inverse" ng-click="model.backupAll()">Backup all apps</button>
         
     </div>

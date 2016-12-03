@@ -6,6 +6,7 @@
         <div class="lui-dialog__body">
             <h3>{{model.thisRow[0]}}</h3>
             <p>will be restored to the Qlik Sense site as a new app into the selected user's my work area.</p>
+            
             <div id="hw">    
                 <select chosen max-shown-results="5" search-contains="true" placeholder-text-single="'Select a user...'"  name="userSelect" id="selectUser" ng-model="model.user" class="lui-select lui-select--inverse" data-ng-change="model.userSelect()">
                     <option ng-repeat="user in model.users track by $index" value="{{user.id}}">{{user.name}}</option>
@@ -21,10 +22,7 @@
                     <div>
                         <label style="padding-right:10px;"><input type="checkbox" id="checkUpload" value="Upload Upload" ng-click="model.checkUpload()">&nbsp&nbsp&nbsp&nbspUpload Zip archive</label>
                         <input style="display:inline" type="file" ng-show="model.boolUpload" ngf-select="model.selectFile($file)" name="fileRequested">
-                        <input type="button" ng-show="model.boolUpload" class="lui-button lui-button--success" value="Upload File" ng-click="model.upload()" ng-class="model.fileSelected ? 'lui-button--success' : 'lui-button--success lui-disabled'">
-                    </div>
-                    <div>
-                        <p>{{model.fileToRestore}}</p>
+                        <input type="button" ng-show="model.boolUpload" class="lui-button lui-button--success" value="{{model.uploadButtonVal}}" ng-click="model.upload()" ng-class="model.fileSelected ? 'lui-button--success' : 'lui-button--success lui-disabled'">
                     </div>
                     <div>
                         <label style="padding-right:10px;"><input type="checkbox" id="checkReload" value="Reload" ng-click="model.checkReload()">&nbsp&nbsp&nbsp&nbspReload app data on restore</label>
@@ -36,7 +34,20 @@
         <div class="lui-dialog__footer">
             <input type="button" value="Cancel" class="lui-button lui-button--error" ng-click="model.cancel()">
             <input type="button" value="Restore" class="lui-button lui-button--success" ng-click="model.generateRestore()">
+            <!--<input type="button" value="modal" ng-click="model.modal = !model.modal">-->
         </div>
     </div>
+    </div>
+</div>
+
+<div class="frame" style="position: fixed;top:120px;left:270px;bottom:70px;right:20px;overflow-y: auto; " ng-show="model.modal">
+    <div class="lui-dialog" style="width: 50%;height:50%;overflow-y: auto;opacity:0.5">
+        <div id="imageWrapper" style="width:100%;height100%;overflow:hidden;margin:auto">
+            
+            <div>
+                <img id="spin" style="width:40%;height:40%;margin:auto;display:block;overflow:hidden" src="../sclite/data/loader.svg" />
+            </div>
+            
+        </div>
     </div>
 </div>

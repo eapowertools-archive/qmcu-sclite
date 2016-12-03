@@ -13,9 +13,26 @@
         return $http.get('/sclite/getAppList')
             //return $http.get("data/testData.json")
             .then(function (response) {
-                return response.data;
+                var updatedData = alterTableData(response);
+                console.log(updatedData);
+                return updatedData.data;
             });
     } 
+
+    function alterTableData(response){
+        var newRows =[];
+        response.data.rows.forEach(function(row)
+        {
+            if(row[4].substring(0,4)=="1753")
+            {
+                row[4] = null;
+            }
+            newRows.push(row);
+        });
+        response.data.rows = newRows;
+        return response;
+
+    }
 
     function fetchFolders($http){
         return $http.get("/sclite/dir")
@@ -37,15 +54,14 @@
         return $http.get("/sclite/getuserinfo")
         .then(function(response)
         {
-            console.log(response.data);
             return response.data;
         });
     }
 
-    function backupApp($http, appId, boolZip){
-        if(boolZip)
+    function backupApp($http, params){
+        if(params.createZip)
         {
-            return exportZip($http, appId, boolZip)
+            return exportZip($http, params)
             .then(function(response)
             {
                 return response.data;
@@ -53,7 +69,7 @@
         }
         else
         {
-            return $http.post("/sclite/backup/" + appId, boolZip)
+            return $http.post("/sclite/backup", params)
             .then(function(response)
             {
                 return response.data;
@@ -78,14 +94,22 @@
         });
     }
 
-    function exportZip($http, appId, createZip) {
-        return $http.post('/sclite/backup/' + appId, createZip, {responseType: 'arraybuffer'})
+    function exportZip($http, params) {
+        return $http.post('/sclite/backup', params, {responseType: 'arraybuffer'})
             .success(function (data, status, headers, config) {
                 var zipBlob = new Blob([data], {type: 'application/zip'});
                 // var jsonBlob = new Blob([JSON.stringify(data, null, " ") + '\n'], {
                 //         type: "application/json;charset=utf-8;"
                 //     });
-                var fileName = appId + ".zip";
+                var fileName;
+                if(params.appIds.length > 1)
+                {
+                    fileName = "allAppsBackup.zip";
+                }
+                else
+                {
+                    fileName = params.appIds[0] + ".zip";
+                }
                 if (window.navigator.msSaveOrOpenBlob) {
                     // IE hack; see http://msdn.microsoft.com/en-us/library/ie/hh779016.aspx
                     window.navigator.msSaveBlob(zipBlob, fileName);
@@ -119,8 +143,11 @@
         model.boolReload = false;
         model.file = [];
         model.fileUploaded = false;
+        model.showAll = false;
         //model.fileToRestore = null;
         model.users = [];
+        model.uploadButtonVal = "Upload File";
+        model.modal = false;
 
         model.$onInit = function(){
             fetchTableHeaders($http)
@@ -142,6 +169,37 @@
             });
         };
 
+        model.toggleUnpublished = function()
+        {
+            if(model.showAll)
+            {
+                model.showAll = false;
+            }
+            else
+            {
+                model.showAll = true;
+            }
+        }
+
+        model.showUnpublished = function(published)
+        {
+            if(model.showAll)
+            {
+                return true;
+            }
+            else
+            {
+                if(published==null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+
         model.userSelect = function(){
             
             console.log(model.user);
@@ -159,6 +217,16 @@
             ngDialog.open({
                 template: "plugins/scLite/backup-dialog.html",
                 className: "backup-dialog",
+                controller: scLiteController,
+                scope: $scope
+            });
+        }
+
+        model.backupAll = function()
+        {
+            ngDialog.open({
+                template: "plugins/scLite/backup-all-dialog.html",
+                className: "backup-all-dialog",
                 controller: scLiteController,
                 scope: $scope
             });
@@ -199,7 +267,7 @@
         }
 
         model.generateBackup = function(){
-            backupApp($http, model.thisRow[1], {createZip: model.zip})
+            backupApp($http, {appIds: [model.thisRow[1]], createZip: model.zip})
             .then(function(response)
             {
                 //console.log(response);
@@ -208,7 +276,44 @@
             })
         }
 
+        model.generateBackupAll = function ()
+        {
+            model.modal = true;
+            var appIds = []
+            if(model.showAll)
+            {
+                //grab the appIds from the table and send them in body to the engine for backup
+                appIds = model.tableRows.map(function(row)
+                {
+                    return row[1];
+                });
+            }
+            else
+            {
+                appIds = model.tableRows.filter(function(row)
+                {
+                    return row[4]!==null
+                })
+                appIds = appIds.map(function(row)
+                {
+                    return row[1];
+                });
+            }
+            
+            backupApp($http, {appIds: appIds, createZip: model.zip})
+            .then(function(response)
+            {
+                //console.log(response);
+                model.zip = false;
+                model.modal = false;
+                ngDialog.closeAll();
+            })
+
+        }
+
+
         model.restore = function(row){
+            model.uploadButtonVal = "Upload File";
             model.thisRow = row;
             ngDialog.open({
                     template: "plugins/scLite/restore-dialog.html",
@@ -242,17 +347,23 @@
                 model.fileUploaded = true;
                 console.log(response);
                 model.fileToRestore = response.data.filePath;
-
+                model.uploadButtonVal = "File Uploaded";
             })
         }
 
         model.generateRestore = function(){
-            
+            model.modal = true;
             restoreApp($http, model.thisRow[1], 
                 model.boolUpload, model.fileToRestore, model.boolReload, model.user)
             .then(function(response)
             {
                 console.log(response)
+                model.modal = false;
+                
+            })
+            .then(function()
+            {
+                ngDialog.closeAll();
             });
         }
     }

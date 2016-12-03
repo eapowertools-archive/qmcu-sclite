@@ -12,6 +12,7 @@ var archive = require('./lib/archive');
 var multer = require('multer');
 var autoReap = require('multer-autoreap');
 var decompress = require('./lib/decompress');
+var Promise = require('bluebird');
 
 router.use('/lib', express.static(config.thisServer.pluginPath + "/sclite/lib"));
 router.use('/data', express.static(config.thisServer.pluginPath + "/sclite/data"));
@@ -27,16 +28,24 @@ router.route("/dir")
     processReq(_p, res);
 });
 
-router.route("/backup/:id")
+router.route("/backup")
 .post(function(req, res)
 {
     var body = req.body;
-    backupApp.backupApp(req.params.id)
-    .then(function(result)
+    Promise.map(body.appIds, (function(appId)
     {
+        return backupApp.backupApp(appId)
+        .then(function(result)
+        {
+            return result;
+        });      
+    }))
+    .then(function(resultArray)
+    {
+        console.log(resultArray);
         if(body.createZip)
         {
-            return archive.createZip(req.params.id)
+            return archive.createZip(resultArray)
             .then(function(archiveResult)
             {
                 res.setHeader('Content-disposition', 'attachment; filename=' + archiveResult.fileName);
@@ -53,20 +62,9 @@ router.route("/backup/:id")
         }
         else
         {
-            res.send(result);
+             res.send(resultArray);
         }
     });
-});
-
-router.route("/backup/all")
-.post(function(req, res)
-{
-    //add code for looping through all apps and backing them up.
-    backupApp.backupApp(req.params.id)
-    .then(function(result)
-    {
-        res.send(result);
-    })
 });
 
 router.route("/restore")
@@ -158,7 +156,7 @@ router.route("/getAppList")
 
     tableDef.columns = columns;
 
-    qrsInteract.Post("app/table?filter=published eq true&orderAscending=true&skip=0&sortColumn=name", tableDef, "json")
+    qrsInteract.Post("app/table?orderAscending=true&skip=0&sortColumn=name", tableDef, "json")
     .then(function(result)
     {
         var s = JSON.stringify(result.body);

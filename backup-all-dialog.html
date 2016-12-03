@@ -1,0 +1,37 @@
+<div class="frame" style="position: fixed;top:120px;left:270px;bottom:70px;right:20px;overflow-y: auto;">
+    <div class="lui-dialog" style="width: 50%;height:50%;overflow-y: auto;">
+        <div class="lui-dialog__header">
+            <div class="lui-dialog__title">Backup All Apps</div>
+        </div>
+        <div class="lui-dialog__body">
+            <p>All apps will be backed up on the server.  Please check the checkbox to download a zip archive of all the apps.</p>
+            <br>
+            <div style="verticalAlign:middle;">
+                <label><input type="checkbox" id="checkZip" value="Download Zip" ng-click="model.checkZip()">&nbsp&nbsp&nbsp&nbspDownload Zip archive</label>
+            </div>
+            <div>
+                <p ng-show="model.zip">A zip archive will be created along with a server side copy of all the serialized apps.</p>
+            </div>
+            <!--<ul ng-repeat="folder in model.folders track by $index">
+                <li>{{folder.id}}</li>
+            </ul>-->
+        </div>
+
+        <div class="lui-dialog__footer">
+            <input type="button" value="Cancel" class="lui-button lui-button--error" ng-click="model.cancel()">
+            <input type="button" value="Backup" class="lui-button lui-button--success" ng-click="model.generateBackupAll()">
+        </div>
+    </div>
+    </div>
+</div>
+
+<div class="frame" style="position: fixed;top:120px;left:270px;bottom:70px;right:20px;overflow-y: auto; " ng-show="model.modal">
+    <div class="lui-dialog" style="width: 50%;height:50%;overflow-y: auto;opacity:0.5">
+        <div id="imageWrapper" style="width:100%;height100%;overflow:hidden;margin:auto">
+            <div>
+                <img id="spin" style="width:40%;height:40%;margin:auto;display:block;overflow:hidden" src="../sclite/data/loader.svg" />
+            </div>
+            
+        </div>
+    </div>
+</div>
