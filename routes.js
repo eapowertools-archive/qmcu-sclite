@@ -14,6 +14,20 @@ var autoReap = require('multer-autoreap');
 var decompress = require('./lib/decompress');
 var Promise = require('bluebird');
 
+var winston = require('winston');
+require('winston-daily-rotate-file');
+
+//set up logging
+  var logger = new (winston.Logger)({
+    level: config.logging.logLevel,
+    transports: [
+        new (winston.transports.Console)(),
+        new (winston.transports.DailyRotateFile)({ filename: config.logging.logPath + "qmcu-sclite.log", prepend:true})
+      ]
+  });
+
+logger.info("qmcu-sclite logging started");
+
 router.use('/lib', express.static(config.thisServer.pluginPath + "/sclite/lib"));
 router.use('/data', express.static(config.thisServer.pluginPath + "/sclite/data"));
 router.use('/output', express.static(config.thisServer.pluginPath + "/sclite/output"));
@@ -31,6 +45,7 @@ router.route("/dir")
 router.route("/backup")
 .post(function(req, res)
 {
+    logger.info("Commencing backup process", {module:'sclite-routes', method:'backup'});
     var body = req.body;
     Promise.map(body.appIds, (function(appId)
     {
@@ -42,9 +57,11 @@ router.route("/backup")
     }))
     .then(function(resultArray)
     {
+        logger.info("Backup(s) complete", {module:'sclite-routes', method:'backup'});
         console.log(resultArray);
         if(body.createZip)
         {
+            logger.info("Zip files requested", {module:'sclite-routes', method:'backup'});
             return archive.createZip(resultArray)
             .then(function(archiveResult)
             {
@@ -55,13 +72,16 @@ router.route("/backup")
                 {
                     if(!error)
                     {
-                        console.log("yay team");
+                        logger.info("Backup process complete", {module:'sclite-routes', method:'backup'});
+                        logger.info("Spawning download of zip archive", {module:'sclite-routes', method:'backup'});
+                        logger.info("yay team", {module:'sclite-routes', method:'backup'});
                     }
                 });
             });
         }
         else
         {
+            logger.info("Backup process complete", {module:'sclite-routes', method:'backup'});
              res.send(resultArray);
         }
     });
@@ -70,11 +90,11 @@ router.route("/backup")
 router.route("/restore")
 .post(parseUrlencoded, function(req, res)
 {
-    console.log(req.body);
+    logger.info("Commencing Restore process", {module:'sclite-routes', method:'restore'});
     var body = req.body;
     if(body.boolZip)
     {
-        console.log(body);
+        logger.info("A zip file (" + body.filePath + ") has been uploaded for restore", {module:'sclite-routes', method:'restore'});
         //decompress here
         decompress.extractFiles(body.filePath)
         .then(function(files)
@@ -84,9 +104,11 @@ router.route("/restore")
             appFileName = appFileName[appFileName.length-1].substring(0, appFileName[appFileName.length-1].length - 4);
             var appLocation = path.join(config.outputPath, appFileName);
             console.log(appLocation)
+            logger.info("Commencing Restore on file " + body.filePath , {module:'sclite-routes', method:'restore'});
             restoreApp.restoreApp(appLocation,body.owner,body.boolReload)
             .then(function(result)
             {
+                logger.info("App has been restored.  Here is the result::" + JSON.stringify(result), {module:'sclite-routes', method:'restore'});
                 console.log(result);
                 res.json(result);
             });
@@ -94,6 +116,7 @@ router.route("/restore")
     }
     else
     {
+        logger.info("Commencing Restore process on " + body.appId, {module:'sclite-routes', method:'restore'});
         restoreApp.restoreApp(path.join(config.outputPath, body.appId),body.owner,body.boolReload)
         .then(function(result)
         {
@@ -111,7 +134,7 @@ router.post('/upload', upload.array('file', 1) , function (req, res)
   // req.body will hold the text fields, if there were any
  //console.log("Iam files");
   //console.log(req.files);
-
+logger.info("Uploading file " + req.files[0], {module:'sclite-routes', method:'upload'});
   console.log(req.files[0]);
   	fs.readFile(req.files[0].path, function(err, data)
     {
@@ -121,6 +144,7 @@ router.post('/upload', upload.array('file', 1) , function (req, res)
         {
             if(err)
             {
+                logger.error(err, {module:'sclite-routes', method:'upload'});
                 console.log(err);
                 // res.on('autoreap', function(reapedFile)
                 // {
@@ -129,10 +153,11 @@ router.post('/upload', upload.array('file', 1) , function (req, res)
                 res.send("<h1>ERROR</h1><br><p>" + err + "</p>");
             }
             else{
+                logger.info("File Saved to " + newPath, {module:'sclite-routes', method:'upload'});
                 console.log("File Saved to " + newPath);
                 res.on('autoreap', function(reapedFile)
                 {
-                   
+                   logger.info("temp upload file removed", {module:'sclite-routes', method:'upload'});
                     console.log(reapedFile);
                 });
                 res.send({filePath: newPath, message: req.files[0].originalname + "uploaded and ready to restore"});
