@@ -97,14 +97,13 @@ router.route("/restore")
         logger.info("A zip file (" + body.filePath + ") has been uploaded for restore", {module:'sclite-routes', method:'restore'});
         //decompress here
         decompress.extractFiles(body.filePath)
-        .then(function(files)
+        .then(function(fileName)
         {
             console.log(body.filePath);
-            var appFileName = body.filePath.split("\\");
-            appFileName = appFileName[appFileName.length-1].substring(0, appFileName[appFileName.length-1].length - 4);
-            var appLocation = path.join(config.outputPath, appFileName);
+            var appFileName = fileName;
+            var appLocation = path.join(config.outputPath, fileName);
             console.log(appLocation)
-            logger.info("Commencing Restore on file " + body.filePath , {module:'sclite-routes', method:'restore'});
+            logger.info("Commencing Restore process on " + body.appId + "to owner " + body.owner, {module:'sclite-routes', method:'restore'});
             restoreApp.restoreApp(appLocation,body.owner,body.boolReload)
             .then(function(result)
             {
@@ -116,7 +115,7 @@ router.route("/restore")
     }
     else
     {
-        logger.info("Commencing Restore process on " + body.appId, {module:'sclite-routes', method:'restore'});
+        logger.info("Commencing Restore process on " + body.appId + "to owner " + body.owner, {module:'sclite-routes', method:'restore'});
         restoreApp.restoreApp(path.join(config.outputPath, body.appId),body.owner,body.boolReload)
         .then(function(result)
         {

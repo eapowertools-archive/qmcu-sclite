@@ -2,14 +2,17 @@
     "use strict";
     var module = angular.module("QMCUtilities",["ngFileUpload","ngDialog"]);
 
-    function fetchTableHeaders($http) {
+    function fetchTableHeaders($http)
+    {
+
         return $http.get("/sclite/data/tableDef.json")
             .then(function (response) {
                 return response.data;
             });
     }
     
-    function fetchTableRows($http) {
+    function fetchTableRows($http) 
+    {
         return $http.get('/sclite/getAppList')
             //return $http.get("data/testData.json")
             .then(function (response) {
@@ -19,7 +22,8 @@
             });
     } 
 
-    function alterTableData(response){
+    function alterTableData(response)
+    {
         var newRows =[];
         response.data.rows.forEach(function(row)
         {
@@ -34,23 +38,17 @@
 
     }
 
-    function fetchFolders($http){
+    function fetchFolders($http)
+    {
         return $http.get("/sclite/dir")
         .then(function(response)
         {
             return response.data;
         });
     }
-
-    function fetchOwner($http, userInfo){
-        return $http.get("/sclite/getOwnerId/" + userInfo.userDirectory + "/" + userInfo.userId)
-        .then(function(response)
-        {
-            return response.data;
-        });
-    }
     
-    function fetchUserInfo($http){
+    function fetchUserInfo($http)
+    {
         return $http.get("/sclite/getuserinfo")
         .then(function(response)
         {
@@ -58,13 +56,18 @@
         });
     }
 
-    function backupApp($http, params){
+    function backupApp($http, params)
+    {
         if(params.createZip)
         {
             return exportZip($http, params)
             .then(function(response)
             {
                 return response.data;
+            })
+            .catch(function(error)
+            {
+                return error;
             });
         }
         else
@@ -73,12 +76,17 @@
             .then(function(response)
             {
                 return response.data;
+            })
+            .catch(function(error)
+            {
+                return error;
             });
         }
 
     }
 
-    function restoreApp($http, appId, boolZip, filePath, boolReload, owner){
+    function restoreApp($http, appId, boolZip, filePath, boolReload, owner)
+    {
         var body = {
             appId : appId,
             boolZip : boolZip,
@@ -91,10 +99,15 @@
         {
             console.log(response);
             return response.data
+        })
+        .catch(function(error)
+        {
+            return error;
         });
     }
 
-    function exportZip($http, params) {
+    function exportZip($http, params) 
+    {
         return $http.post('/sclite/backup', params, {responseType: 'arraybuffer'})
             .success(function (data, status, headers, config) {
                 var zipBlob = new Blob([data], {type: 'application/zip'});
@@ -144,12 +157,13 @@
         model.file = [];
         model.fileUploaded = false;
         model.showAll = false;
-        //model.fileToRestore = null;
+        model.fileToRestore = null;
         model.users = [];
         model.uploadButtonVal = "Upload File";
         model.modal = false;
 
-        model.$onInit = function(){
+        model.$onInit = function()
+        {
             fetchTableHeaders($http)
             .then(function(table){
                 model.columnNames = table.columns;
@@ -200,25 +214,64 @@
             }
         }
 
-        model.userSelect = function(){
-            
+        model.userSelect = function()
+        {
             console.log(model.user);
         }
 
-        model.cancel = function(){
+        model.cancel = function()
+        {
             model.thisRow = [];
             model.zip = false;
+            model.modal = false;
             model.boolUpload = false;
+            model.boolReload = false;
+            model.fileToRestore = null;
+            model.user = null;
+            model.file = [];
+            model.fileUploaded = false;
+            $("#selectUser option:eq(0)").prop('selected',true);
             ngDialog.closeAll();
+            $scope.form.$setPristine();
+            $scope.form.$setUntouched();
         }
 
-        model.backup = function(row){
+        model.backup = function(row)
+        {
             model.thisRow = row;
             ngDialog.open({
                 template: "plugins/scLite/backup-dialog.html",
                 className: "backup-dialog",
                 controller: scLiteController,
                 scope: $scope
+            });
+        }
+
+        model.generateBackup = function()
+        {
+            backupApp($http, {appIds: [model.thisRow[1]], createZip: model.zip})
+            .then(function(response)
+            {
+                //console.log(response);
+                model.zip = false;
+                return;    
+            })
+            .then(function()
+            {
+                // ngDialog.closeAll();
+                // $scope.form.$setPristine();
+                // $scope.form.$setUntouched();
+            })
+            .catch(function(error)
+            {
+                alert(error);
+            })
+            .finally(function()
+            {
+                model.zip = false;
+                ngDialog.closeAll();
+                $scope.form.$setPristine();
+                $scope.form.$setUntouched();
             });
         }
 
@@ -230,50 +283,6 @@
                 controller: scLiteController,
                 scope: $scope
             });
-        }
-
-        model.checkZip = function(){
-            if($("#checkZip:checked").length==1)
-            {
-                model.zip = true;
-            }
-            else
-            {
-                model.zip = false;
-            }
-        }
-
-        model.checkUpload = function(){
-            if($("#checkUpload:checked").length==1)
-            {
-                model.boolUpload = true;
-            }
-            else
-            {
-                model.boolUpload = false;
-            }
-        }
-
-        model.checkReload = function(){
-            
-            if($("#checkReload:checked").length==1)
-            {
-                model.boolReload = true;
-            }
-            else
-            {
-                model.boolReload = false;
-            }
-        }
-
-        model.generateBackup = function(){
-            backupApp($http, {appIds: [model.thisRow[1]], createZip: model.zip})
-            .then(function(response)
-            {
-                //console.log(response);
-                model.zip = false;
-                ngDialog.closeAll();
-            })
         }
 
         model.generateBackupAll = function ()
@@ -306,13 +315,64 @@
                 //console.log(response);
                 model.zip = false;
                 model.modal = false;
-                ngDialog.closeAll();
+                return;
             })
+            .then(function()
+            {
+                ngDialog.closeAll();
+                $scope.form.$setPristine();
+                $scope.form.$setUntouched();
+            })
+            .catch(function(error)
+            {
+                alert(error);
+            })
+            .finally(function()
+            {
+                model.zip = false;
+                model.modal = false;
+            });
 
         }
 
+        model.checkZip = function()
+        {
+            if($("#checkZip:checked").length==1)
+            {
+                model.zip = true;
+            }
+            else
+            {
+                model.zip = false;
+            }
+        }
 
-        model.restore = function(row){
+        model.checkUpload = function()
+        {
+            if($("#checkUpload:checked").length==1)
+            {
+                model.boolUpload = true;
+            }
+            else
+            {
+                model.boolUpload = false;
+            }
+        }
+
+        model.checkReload = function() //not implemented
+        {
+            if($("#checkReload:checked").length==1)
+            {
+                model.boolReload = true;
+            }
+            else
+            {
+                model.boolReload = false;
+            }
+        }
+
+        model.restore = function(row)
+        {
             model.uploadButtonVal = "Upload File";
             model.thisRow = row;
             ngDialog.open({
@@ -323,14 +383,52 @@
                 });
         }
 
-       model.selectFile = function(files){
-            model.fileSelected=true;
-            console.log(files);
-            //return model.file = files;
-            model.file = files;
+        model.generateRestore = function()
+        {
+            model.modal = true;
+            restoreApp($http, model.thisRow[1], 
+                model.boolUpload, model.fileToRestore, model.boolReload, model.user)
+            .then(function(response)
+            {
+                // model.modal = false;
+                // model.boolUpload = false;
+                // model.boolReload = false;
+                // model.fileUploaded = false;
+                // model.fileToRestore = null;
+                // model.user = null;
+                // $("#selectUser option:eq(0)").prop('selected',true);
+                return;
+            })
+            .then(function()
+            {
+                ngDialog.closeAll();
+                $scope.form.$setPristine();
+                $scope.form.$setUntouched();
+            })
+            .catch(function(error)
+            {
+                alert(error);
+            })
+            .finally(function()
+            {
+                model.modal = false;
+                model.boolUpload = false;
+                model.boolReload = false;
+                model.fileUploaded = false;
+                model.fileToRestore = null;
+                model.user = null;
+                $("#selectUser option:eq(0)").prop('selected',true);
+            });
         }
 
-        model.upload = function(){
+        model.selectFile = function(files)
+        {
+                model.fileSelected=true;
+                model.file = files;
+        }
+
+        model.upload = function()
+        {
             Upload.upload({
                 url:"/sclite/upload",
                 data:
@@ -345,25 +443,8 @@
                 model.file = [];
                 model.fileSelected = false;
                 model.fileUploaded = true;
-                console.log(response);
                 model.fileToRestore = response.data.filePath;
                 model.uploadButtonVal = "File Uploaded";
-            })
-        }
-
-        model.generateRestore = function(){
-            model.modal = true;
-            restoreApp($http, model.thisRow[1], 
-                model.boolUpload, model.fileToRestore, model.boolReload, model.user)
-            .then(function(response)
-            {
-                console.log(response)
-                model.modal = false;
-                
-            })
-            .then(function()
-            {
-                ngDialog.closeAll();
             });
         }
     }

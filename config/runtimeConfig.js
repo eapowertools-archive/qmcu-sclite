@@ -15,7 +15,8 @@ config = extend(true, config, {
         key: fs.readFileSync(config.certificates.client_key),
         cert: fs.readFileSync(config.certificates.client),
         headers: {
-            "X-Qlik-User" : config.qsocks.repoAccount
+            "X-Qlik-User" : config.qsocks.repoAccount,
+            "X-Qlik-Xrfkey" : "abcdefghijklmnop"
         }
     },
     qrs: {
