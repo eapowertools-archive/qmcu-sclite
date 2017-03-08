@@ -37,6 +37,8 @@ router.use(function(req, res, next) {
     // console.log("cookie to be used: " + cookies[0]);
     if (req.proxyPath.length !== 0) {
         qrs.UpdateVirtualProxyPrefix(req.proxyPath.replace("/", ""));
+    } else {
+        qrs.UpdateVirtualProxyPrefix("");
     }
     qrs.UseCookie(req.sessionCookieToUse);
 

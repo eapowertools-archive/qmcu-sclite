@@ -1,16 +1,16 @@
-<div class="navbar-fixed-top">
-    <div id="page-content-header">
-        <h1 class="title">Source Control Lite</h1>
-        <button style="float:right;margin-right:20px;margin-top:20px;" class="lui-button  lui-button--toolbar-inverse" id="help-dialog"
-            ng-click="model.openHelp()">?</button>
+<div>
+    <div id="page-content-header" class="navbar-fixed-top flex-container">
+        <h1 class="title">Source Control Lite on: {{model.host}}</h1>
+        <button style="float:right;margin-right:400px;margin-top:20px;" class="lui-button  lui-button--toolbar-inverse" id="help-dialog" ng-click="model.openHelp()">?</button>
     </div>
-    <div id="page-content-search">
-        <div class="lui-bg-inverse">
-            <div class="lui-search lui-search--inverse">
-                <span class="lui-search__search-icon"></span>
-                <input type="text" class="lui-search__input" maxlength="255" spellcheck="false" placeholder="Search" ng-model="searchApps"
-                />
-                <span class="lui-search__clear-icon"></span>
+    <div id="second-header">
+        <div id="page-content-search">
+            <div class="lui-bg-inverse">
+                <div class="lui-search lui-search--inverse" style="padding-left:5px">
+                    <span class="lui-search__search-icon"></span>
+                    <input type="text" class="lui-search__input" maxlength="255" spellcheck="false" placeholder="Search" ng-model="searchApps" />
+                    <span class="lui-search__clear-icon"></span>
+                </div>
             </div>
         </div>
     </div>
@@ -54,7 +54,7 @@
                 </colgroup>
                 <thead>
                     <tr>
-                        <th  class="column" style="margin:auto;text-align:center;" ng-repeat="column in model.columnNames | filter: display=true | orderBy: '+colNum' ">
+                        <th class="column" style="margin:auto;text-align:center;" ng-repeat="column in model.columnNames | filter: display=true | orderBy: '+colNum' ">
                             {{column.friendlyName}}
                         </th>
                     </tr>
@@ -76,6 +76,6 @@
     <div id="button-bar">
         <button id="toggleUnPublishedApps" class="lui-button lui-bg-inverse" ng-click="model.toggleUnpublished()">Toggle unpublished apps</button>
         <button id="buttonBackupAll" class="lui-button lui-bg-inverse" ng-click="model.backupAll()">Backup all apps</button>
-        
+
     </div>
 </div>

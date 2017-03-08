@@ -117,7 +117,7 @@
             });
     }
 
-    function scLiteController($scope, $http, ngDialog, Upload) {
+    function scLiteController($scope, $http, ngDialog, Upload, qmcuWindowLocationService) {
         var model = this;
         var colNames = [];
         model.columnNames = [];
@@ -136,6 +136,7 @@
         model.users = [];
         model.uploadButtonVal = "Upload File";
         model.modal = false;
+        model.host = qmcuWindowLocationService.host;
 
         model.$onInit = function() {
             fetchTableHeaders($http)
@@ -373,7 +374,7 @@
     module.component("scliteBody", {
         templateUrl: "plugins/sclite/sclite-body.html",
         controllerAs: "model",
-        controller: ["$scope", "$http", "ngDialog", "Upload", scLiteController]
+        controller: ["$scope", "$http", "ngDialog", "Upload", "qmcuWindowLocationService", scLiteController]
     });
 
     module.filter('highlight', function() {

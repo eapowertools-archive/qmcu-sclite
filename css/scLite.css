@@ -1,43 +1,61 @@
-.scLite .navbar-fixed-top
-{
-    margin-left:250px;
+.scLite .flex-container {
+    display: -webkit-inline-flex;
+    /* Safari */
+    display: inline-flex;
+    -webkit-flex-wrap: nowrap;
+    /* Safari */
+    flex-wrap: nowrap;
+    -webkit-justify-content: space-between;
+    /* Safari */
+    justify-content: space-between;
+}
+
+.scLite .navbar-fixed-top {
+    margin-left: 250px;
 }
 
 .scLite #page-content-header {
-    background:#404040;
-    top:0;
-    height:69px;
-    width:100%;
-    line-height: 69px;
-    z-index:1000;
+    background: #404040;
+    top: 0;
+    height: 60px;
+    width: 100%;
+}
+
+.scLite #second-header {
+    position: fixed;
+    width: 100%;
+    top: 60px;
+    height: 38px;
+    background: #404040;
+    z-index: 5000;
 }
 
 .scLite #page-content-search {
-    top:70px;
+    position: fixed;
+    top: 60px;
     height: 38px;
-    z-index:1000;
-
+    width: 100%;
+    z-index: 1000;
 }
 
 .scLite #page-content-body {
-    margin-top: 107px;
+    margin-top: 39px;
     margin-bottom: 50px;
 }
 
-
 .scLite #page-content-footer {
-   position:fixed;
-   bottom:0px;
-   height:50px;
-   width:100%;
-   background: #8C8C8C;
+    position: fixed;
+    bottom: 0px;
+    height: 50px;
+    width: 100%;
+    background: #8C8C8C;
 }
 
 .scLite #button-bar {
-  position: absolute;
-  top: 50%;
-  left:10px;
-  transform: translateY(-50%);
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
 }
 
 .scLite .support {
@@ -45,19 +63,19 @@
 }
 
 .scLite .title {
-    color: rgba(255,255,255,0.8);
-    float:left;
+    color: rgba(255, 255, 255, 0.8);
+    float: left;
     font-size: 36px;
-    margin-top:15px;
-    padding-left:15px;
+    margin-top: 15px;
+    padding-left: 15px;
 }
 
 .scLite .usage-content {
     position: absolute;
-    width:600px;
+    width: 600px;
     height: 250px;
-    margin-top:-15%;
-    margin-left:20%;
+    margin-top: -15%;
+    margin-left: 20%;
 }
 
 .scLite .highlighted {
@@ -65,63 +83,71 @@
     background-color: #A0A0A0;
 }
 
-.scLite tbody tr.hover#highlighted{
+.scLite tbody tr.hover#highlighted {
     color: #ffffff;
     background-color: #595959;
 }
 
-.scLite tbody tr:hover, tr.alt:hover {
+.scLite tbody tr:hover,
+tr.alt:hover {
     color: #ffffff;
     background-color: #595959;
 }
 
-
-.scLite .column{
+.scLite .column {
     word-wrap: break-word;
-    width:200px;
+    width: 200px;
 }
 
-.scLite .small-column
-{
-    width:100px;
+.scLite .small-column {
+    width: 100px;
 }
 
-.scLite .table-data
-{
+.scLite .table-data {
     /*margin-top:145px;*/
-    overflow-y:auto;
-    table-layout:fixed;
-    overflow-x:hidden;
+    overflow-y: auto;
+    table-layout: fixed;
+    overflow-x: hidden;
 }
 
-.scLite .table-head
-{
-    margin-bottom:0px;
+.scLite .table-head {
+    margin-bottom: 0px;
     background: white;
-    table-layout:fixed;
+    table-layout: fixed;
 }
 
 .scLite .highlightedText {
-    background:yellow;
+    background: yellow;
 }
 
-@-webkit-keyframes spinnerRotate
-{
-    from{-webkit-transform:rotate(0deg);}
-    to{-webkit-transform:rotate(360deg);}
-}
-@-moz-keyframes spinnerRotate
-{
-    from{-moz-transform:rotate(0deg);}
-    to{-moz-transform:rotate(360deg);}
-}
-@-ms-keyframes spinnerRotate
-{
-    from{-ms-transform:rotate(0deg);}
-    to{-ms-transform:rotate(360deg);}
+@-webkit-keyframes spinnerRotate {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+    }
 }
 
-#spin{
+@-moz-keyframes spinnerRotate {
+    from {
+        -moz-transform: rotate(0deg);
+    }
+    to {
+        -moz-transform: rotate(360deg);
+    }
+}
+
+@-ms-keyframes spinnerRotate {
+    from {
+        -ms-transform: rotate(0deg);
+    }
+    to {
+        -ms-transform: rotate(360deg);
+    }
+}
+
+#spin {
     /*position:fixed; */
     /*top:50%;
     left:50%; */
