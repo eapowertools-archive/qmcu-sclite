@@ -1,5 +1,9 @@
 {
-    "title":"Source Control Assistant",
-    "pluginDir":"sclite",
-    "stage":"alpha"
+    "title": "Source Control Assistant",
+    "pluginDir": "sclite",
+    "stage": "alpha",
+    "clientFiles": [
+        "plugins/sclite/sclite.component.js",
+        "plugins/sclite/css/sclite.css"
+    ]
 }
