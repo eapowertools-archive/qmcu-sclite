@@ -1,0 +1,1 @@
+xcopy scLite\node_modules ..\..\QlikSenseQMCUtility\plugins\scLite\node_modules /I /Y /R /S

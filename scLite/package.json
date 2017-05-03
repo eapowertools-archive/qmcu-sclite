@@ -35,8 +35,8 @@
     "file-system": "^2.2.1",
     "jsonfile": "^2.4.0",
     "path": "^0.12.7",
-    "qrs-interact": "^2.1.0",
-    "qsocks": "^3.1.0",
+    "qrs-interact": "^2.5.4",
+    "qsocks": "^3.2.1",
     "serializeapp": "^2.2.0"
   }
 }

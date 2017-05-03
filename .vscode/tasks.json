@@ -1,0 +1,20 @@
+// See https://go.microsoft.com/fwlink/?LinkId=733558
+// for the documentation about the tasks.json format
+{
+    "version": "0.1.0",
+    "command": "cmd",
+    "args": ["/C"],
+    "isShellCommand": true,
+    "showOutput": "always",
+    "suppressTaskName": true,
+    "tasks": [{
+            "taskName": "deploy",
+            "args": ["deploy"],
+            "isBuildCommand": true
+        },
+        {
+            "taskName": "copyNPMPackages",
+            "args": ["copyNPMPackages"]
+        }
+    ]
+}
