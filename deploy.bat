@@ -1,0 +1,1 @@
+xcopy scLite ..\..\QlikSenseQMCUtility\plugins\scLite /I /Y /R /S /EXCLUDE:exclusionList.txt
