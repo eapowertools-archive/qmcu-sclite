@@ -4,7 +4,6 @@ var bodyParser = require('body-parser');
 var parseUrlencoded = bodyParser.urlencoded({ extended: false });
 var fs = require('fs');
 var path = require('path');
-var qrsConfig = require('./lib/qrsInstance');
 var qrsInteract = require('qrs-interact');
 var config = require('./config/runtimeConfig');
 var backupApp = require('./lib/backupApp');
@@ -29,22 +28,38 @@ var logger = new(winston.Logger)({
 
 logger.info("qmcu-sclite logging started");
 
+var qrsConfig;
+
+if (!config.thisServer.devMode) {
+    qrsConfig = {
+        hostname: config.qrs.hostname,
+        localCertPath: config.qrs.localCertPath,
+        headers: {
+            "Cookie": "",
+            "Content-Type": "application/json"
+        }
+    };
+} else {
+    qrsConfig = {
+        hostname: config.qrs.hostname,
+        localCertPath: config.qrs.localCertPath
+    };
+}
+
 var qrs = new qrsInteract(qrsConfig);
 
+if (!config.thisServer.devMode) {
+    router.use(function(req, res, next) {
+        // console.log("session cookie in use: " + sessionName[0].sessionCookieHeaderName);
+        // console.log("cookie to be used: " + cookies[0]);
+        if (req.proxyPath.length !== 0) {
+            qrs.UpdateVirtualProxyPrefix(req.proxyPath.replace("/", ""));
+        }
+        qrs.UseCookie(req.sessionCookieToUse);
 
-router.use(function(req, res, next) {
-    // console.log("session cookie in use: " + sessionName[0].sessionCookieHeaderName);
-    // console.log("cookie to be used: " + cookies[0]);
-    if (req.proxyPath.length !== 0) {
-        qrs.UpdateVirtualProxyPrefix(req.proxyPath.replace("/", ""));
-    } else {
-        qrs.UpdateVirtualProxyPrefix("");
-    }
-    qrs.UseCookie(req.sessionCookieToUse);
-
-    next();
-})
-
+        next();
+    })
+}
 
 router.use('/lib', express.static(config.thisServer.pluginPath + "/sclite/lib"));
 router.use('/data', express.static(config.thisServer.pluginPath + "/sclite/data"));
