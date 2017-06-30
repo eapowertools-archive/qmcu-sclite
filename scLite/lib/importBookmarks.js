@@ -2,7 +2,8 @@ var Promise = require('bluebird');
 
 module.exports = function importBookmarks(x, data)
 {
-    return Promise.all(data.bookmarks.map(function(bookmark)
+	var elements = data.bookmarks || data.snapshots;
+    return Promise.all(elements.map(function(bookmark)
     {
         return x.app.createBookmark(bookmark)
         .then(function(handle)
