@@ -34,6 +34,7 @@
     "extend": "^3.0.0",
     "file-system": "^2.2.1",
     "jsonfile": "^2.4.0",
+    "jsonify": "0.0.0",
     "path": "^0.12.7",
     "qrs-interact": "^2.5.4",
     "qsocks": "^3.2.1",

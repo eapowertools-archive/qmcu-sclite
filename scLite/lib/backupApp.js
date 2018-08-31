@@ -2,10 +2,17 @@ var qsocks = require('qsocks');
 var serializeApp = require('serializeapp');
 var Promise = require('bluebird');
 var jsonFile = require('jsonfile');
-var fs = require('fs');
+//var fs = require('fs');
+var fs
+try {
+  fs = require('graceful-fs')
+} catch (_) {
+  fs = require('fs')
+}
 var extend = require('extend');
 var utils = require('./utils');
 var config = require('../config/runtimeConfig');
+var orderedStringify = require('./orderedStringify');
 
 var winston = require('winston');
 require('winston-daily-rotate-file');
@@ -98,17 +105,32 @@ function buildModDate() {
 
 
 function writeFiles(outputPath, appData, appName, appId) {
-    var filename = outputPath + '/' + appId + '/' + appId + '.json';
-    var filepath = outputPath + '/' + appId + '/';
-    jsonFile.writeFileSync(filename, appData, { spaces: 4 });
+	//logger.info({ outputPath: outputPath, appData: appData, appName: appName, appId: appId });
+    try {
+		//var filename = outputPath + '/' + appId + '/' + appId + '.json';
+		var filepath = outputPath + '/' + appId + '/';
+		var i = 0;
+		//fs.writeFileSync(filename, orderedStringify(appData, { space: '  ' } )/*, { spaces: 4 }*/);
 
-    for (var key in appData) {
-        if (appData.hasOwnProperty(key)) {
-            var strObj = "{\"" + key + "\":" + JSON.stringify(appData[key]) + "}";
-            //console.log(strObj);
-            var obj = JSON.parse(strObj);
-            jsonFile.writeFileSync(filepath + key + '.json', obj, { spaces: 4 });
-        }
-    }
+		var orderedKeys = Object.keys(appData).sort();
+
+		for (i=0;i<orderedKeys.length;i++) {
+			var key = orderedKeys[i];
+			if (appData.hasOwnProperty(key)) {
+                var content = orderedStringify(appData[key], { space: '  ' })
+				if ( key === 'loadScript' ) {
+                    content = content.replace( /\\t/gm, '\t' );
+                    content = content.replace( /\\n/gm, '\n' );
+                    content = content.replace( /\\r/gm, '\r' );
+                    content = content.replace( /\\"/gm, '"' );
+                }
+				var strObj = "{\n\"" + key + "\":" + content + "\n}";
+				fs.writeFileSync(filepath + key + '.json', strObj/*, { spaces: 4 }*/);
+			}
+		}
+	} catch(error) {
+		logger.error(error);
+	}
+
     logger.info("All files written to " + filepath + "::" + appName, { module: 'backupApp' });
 }
