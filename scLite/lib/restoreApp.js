@@ -9,6 +9,7 @@ var importBookmarks = require('./importBookmarks');
 var importVariables = require('./importVariables');
 var importDimensions = require('./importDimensions');
 var importMeasures = require('./importMeasures');
+var importColourMaps = require('./importColourMaps');
 
 var winston = require('winston');
 require('winston-daily-rotate-file');
@@ -129,6 +130,12 @@ var restoreApp = {
                         logger.info(dimensionIds, {module:'restoreApp'});
                         x.ids.push({"type":"dimension","ids": dimensionIds});
                         return;
+                    })
+                    .then(function()
+                    {
+                        logger.info("Adding colour maps for dimensions to " + x.appId, {module:'restoreApp'});
+                        var colourMaps = loadFile(inputPath + "/colourmaps.json");
+                        return importColourMaps(x,colourMaps);
                     })
                     .then(function()
                     {
