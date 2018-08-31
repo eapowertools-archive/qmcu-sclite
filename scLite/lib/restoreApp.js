@@ -35,7 +35,7 @@ var restoreApp = {
         {
             logger.info("Restoring " + inputPath + " to owner " + makeOwnerid, {module:'restoreApp'});
             var x = {};
-            var qsocksInstance = extend(true, config.qsocks, 
+            var qsocksInstance = extend(true, config.qsocks,
             {
                 headers:
                 {
@@ -45,7 +45,7 @@ var restoreApp = {
             qsocks.Connect(qsocksInstance).then(function(g)
             {
                 x.global = g;
-                
+
                 var appProps = loadFile(inputPath + "/properties.json");
                 return g.createApp(appProps.properties.qTitle, 'Main')
                 .then(function(result)
@@ -218,7 +218,7 @@ var restoreApp = {
                     {
                         logger.info("Saving App " + x.appId, {module:'restoreApp'});
                         console.log("do save")
-                        
+
                         return x.app.doSave()
                         .then(function()
                         {
@@ -245,11 +245,11 @@ var restoreApp = {
                         })
                         .then(function()
                         {
-                            var result = 
+                            var result =
                             {
                                 appId: x.appId,
                                 appName: appProps.properties.qTitle,
-                                message: "created and placed in selected owner's work area" 
+                                message: "created and placed in selected owner's work area"
                             };
                             logger.info(JSON.stringify(result), {module:'restoreApp'});
                             resolve(result);
@@ -282,6 +282,6 @@ function getObjectCount(arrObjectIds)
     {
         count += item.ids.length;
     });
-    
+
     return count;
 }
