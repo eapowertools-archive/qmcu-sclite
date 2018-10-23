@@ -1,14 +1,20 @@
 var qsocks = require('qsocks');
 var extend = require('extend');
-var fs = require('fs');
 var config = require('../config/runtimeConfig');
 var Promise = require('bluebird');
+var fs
+try {
+  fs = require('graceful-fs')
+} catch (_) {
+  fs = require('fs')
+}
 var loadFile = require('./loadFile');
 var importAppObjects = require('./importAppObjects');
 var importBookmarks = require('./importBookmarks');
 var importVariables = require('./importVariables');
 var importDimensions = require('./importDimensions');
 var importMeasures = require('./importMeasures');
+var importColourMaps = require('./importColourMaps');
 
 var winston = require('winston');
 require('winston-daily-rotate-file');
@@ -29,7 +35,7 @@ var restoreApp = {
         {
             logger.info("Restoring " + inputPath + " to owner " + makeOwnerid, {module:'restoreApp'});
             var x = {};
-            var qsocksInstance = extend(true, config.qsocks, 
+            var qsocksInstance = extend(true, config.qsocks,
             {
                 headers:
                 {
@@ -39,7 +45,7 @@ var restoreApp = {
             qsocks.Connect(qsocksInstance).then(function(g)
             {
                 x.global = g;
-                
+
                 var appProps = loadFile(inputPath + "/properties.json");
                 return g.createApp(appProps.properties.qTitle, 'Main')
                 .then(function(result)
@@ -67,10 +73,32 @@ var restoreApp = {
 
                         x.app = app;
                         x.ids = [];
-                        
-                            logger.info("Loading script to " + x.appId, {module:'restoreApp'});
-                            var loadScript = loadFile(inputPath + "/loadScript.json");
-                            return x.app.setScript(loadScript.loadScript);
+
+                        logger.info("Loading script to " + x.appId, {module:'restoreApp'});
+
+                        function stripBom (content) {
+                          // we do this because JSON.parse would convert it to a utf8 string if encoding wasn't specified
+                          if (Buffer.isBuffer(content)) content = content.toString('utf8');
+                          content = content.replace(/^\uFEFF/, '');
+                          return content;
+                        }
+
+                        try {
+                          var loadScriptTxt = stripBom( fs.readFileSync( inputPath + "/loadScript.json"  ) );
+                          loadScriptTxt = loadScriptTxt.substring( 16, loadScriptTxt.length - 3 );
+                          loadScriptTxt = loadScriptTxt.replace( /\t/gm, '\\t' );
+                          loadScriptTxt = loadScriptTxt.replace( /\n/gm, '\\n' );
+                          loadScriptTxt = loadScriptTxt.replace( /\r/gm, '\\r' );
+                          loadScriptTxt = loadScriptTxt.replace( /"/gm, '\\"' );
+						  logger.info("Script to load is: " + loadScriptTxt);
+						  var strObj = "{\n\"" + "loadScript" + "\":\"" + loadScriptTxt + "\"\n}";
+				          fs.writeFileSync(inputPath + "/loadScript.json", strObj/*, { spaces: 4 }*/);
+						  var loadScript = loadFile(inputPath + "/loadScript.json");
+                        } catch(e) {
+                          logger.info(e);
+                        }
+
+                        return x.app.setScript(loadScript.loadScript);
                     })
                     .then(function(foo)
                     {
@@ -85,6 +113,20 @@ var restoreApp = {
                         x.ids.push({"type":"sheet","ids": sheetIds});
                         return;
                     })
+					.then(function()
+                    {
+                        //add appobjects
+                        logger.info("Adding master objects to " + x.appId, {module:'restoreApp'});
+                        var masterObjects = loadFile(inputPath + "/masterobjects.json");
+                        return importAppObjects(x, masterObjects.masterobjects);
+                    })
+                    .then(function(masterObjectIds)
+                    {
+                        logger.info(masterObjectIds, {module:'restoreApp'});
+						//review type
+                        x.ids.push({"type":"masterobject","ids": masterObjectIds});
+                        return;
+                    })
                     .then(function()
                     {
                         logger.info("Adding bookmarks to " + x.appId, {module:'restoreApp'});
@@ -95,6 +137,18 @@ var restoreApp = {
                     {
                         logger.info(bookmarkIds, {module:'restoreApp'});
                         x.ids.push({"type":"bookmark","ids": bookmarkIds});
+                        return;
+                    })
+					.then(function()
+                    {
+                        logger.info("Adding snapshots to " + x.appId, {module:'restoreApp'});
+                        var snapshots = loadFile(inputPath + "/snapshots.json")
+                        return importBookmarks(x,snapshots);
+                    })
+                    .then(function(snapshotIds)
+                    {
+                        logger.info(snapshotIds, {module:'restoreApp'});
+                        x.ids.push({"type":"snapshot","ids": snapshotIds});
                         return;
                     })
                     .then(function()
@@ -132,6 +186,12 @@ var restoreApp = {
                     })
                     .then(function()
                     {
+                        logger.info("Adding colour maps for dimensions to " + x.appId, {module:'restoreApp'});
+                        var colourMaps = loadFile(inputPath + "/colourmaps.json");
+                        return importColourMaps(x,colourMaps);
+                    })
+                    .then(function()
+                    {
                         logger.info("Adding measures to " + x.appId, {module:'restoreApp'});
                         var measures = loadFile(inputPath + "/measures.json");
                         return importMeasures(x,measures);
@@ -158,7 +218,7 @@ var restoreApp = {
                     {
                         logger.info("Saving App " + x.appId, {module:'restoreApp'});
                         console.log("do save")
-                        
+
                         return x.app.doSave()
                         .then(function()
                         {
@@ -185,11 +245,11 @@ var restoreApp = {
                         })
                         .then(function()
                         {
-                            var result = 
+                            var result =
                             {
                                 appId: x.appId,
                                 appName: appProps.properties.qTitle,
-                                message: "created and placed in selected owner's work area" 
+                                message: "created and placed in selected owner's work area"
                             };
                             logger.info(JSON.stringify(result), {module:'restoreApp'});
                             resolve(result);
@@ -222,6 +282,6 @@ function getObjectCount(arrObjectIds)
     {
         count += item.ids.length;
     });
-    
+
     return count;
 }

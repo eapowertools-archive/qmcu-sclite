@@ -24,9 +24,9 @@
                         <input style="display:inline" type="file" ng-show="model.boolUpload" ngf-select="model.selectFile($file)" name="fileRequested">
                         <input type="button" ng-show="model.boolUpload" class="lui-button lui-button--success" value="{{model.uploadButtonVal}}" ng-click="model.upload()" ng-class="model.fileSelected ? 'lui-button--success' : 'lui-button--success lui-disabled'">
                     </div>
-                    <!--     <div>
+                    <div>
                         <label style="padding-right:10px;"><input type="checkbox" id="checkReload" value="Reload" ng-click="model.checkReload()">&nbsp&nbsp&nbsp&nbspReload app data on restore</label>
-                    </div> -->
+                    </div>
                 </div>
             </div>
             <div class="lui-dialog__footer">
